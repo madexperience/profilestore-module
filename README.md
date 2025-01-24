@@ -64,7 +64,7 @@ Service:UpdateData(player, key, amount)
 ##
 
 
-# [SaveData]
+# [ClearData]
 ```lua
 Service:ClearData(player: Player, key: string)
 ```
