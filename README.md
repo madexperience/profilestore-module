@@ -29,7 +29,6 @@ end
 local myData = Service:GetData()
 print(myData) --플레이어 데이터 출력
 ```
-
 ##
 
 # [UpdateData]
@@ -62,7 +61,6 @@ end
 
 Service:UpdateData(player, key, amount)
 ```
-
 ##
 
 
