@@ -1,0 +1,5 @@
+{
+    "name":"madexperience/profilestoreservice",
+    "className":"ModuleScript",
+    "filePaths":["profilestoreservice.luau","default.project.json"]
+}
