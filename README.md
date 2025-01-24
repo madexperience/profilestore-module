@@ -8,7 +8,7 @@ Get it here:
 
 ## Methods
 
-#[GetData]
+# [GetData]
 ```lua
 Service:GetData(player: Player)
 ```
@@ -32,7 +32,7 @@ print(myData) --플레이어 데이터 출력
 
 ##
 
-#[UpdateData]
+# [UpdateData]
 ```lua
 Service:UpdateData(player: Player, key: string, amount: any?)
 ```
@@ -66,7 +66,7 @@ Service:UpdateData(player, key, amount)
 ##
 
 
-#[SaveData]
+# [SaveData]
 ```lua
 Service:ClearData(player: Player, key: string)
 ```
