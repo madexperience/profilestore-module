@@ -19,8 +19,8 @@ local ProfileStore = require(script.ProfileStore)
 ---------------------------------------------------------------
 ------------------/ 템플릿 설정 /------------------------------
 ---------------------------------------------------------------
-local DATA_STORE_KEY: string = "New4"
-local TEST_DATA_STORE_KEY: string = "Test6"
+local DATA_STORE_KEY: string = "New4" --데이터 스토어 키 생성
+local TEST_DATA_STORE_KEY: string = "Test6" --스튜디오 전용 데이터 키 생성
 local DEFAULT_PLAYER_DATA = {
 	Money = 0;
 	Gem = 0;
@@ -40,50 +40,6 @@ local DEFAULT_PLAYER_DATA = {
 				isEquip = false;
 				Amount = 1;
 			};
-			
-			Banana = {
-				Title = "Banana";
-				SubTitle = "SideMenu";
-				Type = "Dish";
-				ActiveType = "Consumable";
-				Desc = "This is Banana. Very delicious and very yellow!";
-				Class = "E Level";
-				isEquip = false;
-				Amount = 1;
-			};
-		};
-		
-		Sauce = {
-			SpicySauce = {
-				Title = "SpicySauce";
-				SubTitle = "Sauce";
-				Type = "Sauce";
-				ActiveType = "Equippable";
-				Desc = "Red statnic hot sauce ever!";
-				Class = "E Level";
-				isEquip = false;
-				Amount = false;
-			};
-			CarbonaraSauce = {
-				Title = "CarbonaraSauce";
-				SubTitle = "Sauce";
-				Type = "Sauce";
-				ActiveType = "Equippable";
-				Desc = "Very Smoooooth Sauce for kids";
-				Class = "E Level";
-				isEquip = false;
-				Amount = false;
-			};	
-			BuldakSauce = {
-				Title = "BuldakSauce";
-				SubTitle = "Sauce";
-				Type = "Sauce";
-				ActiveType = "Equippable";
-				Desc = "HELL TASTE FLAVOR NGL";
-				Class = "E Level";
-				isEquip = false;
-				Amount = false;
-			};	
 		};
 		
 		Stuff = {};
@@ -99,16 +55,16 @@ local DEFAULT_PLAYER_DATA = {
 ---------------------------------------------------------------
 ----------------------/ 메인 /----------------------------------
 ---------------------------------------------------------------
-export type DEFAULT_PLAYER_DATA = typeof(DEFAULT_PLAYER_DATA)
+type DEFAULT_PLAYER_DATA = typeof(DEFAULT_PLAYER_DATA)
 
-export type G_Types = {
+type G_Types = {
 	ProfileLoad: <T>(player: Player) -> T?,
 	RemoveProfile: (player: Player) -> (),
 	Start: () -> (),
 	GetData: <T>(player: Player) -> T?,
 	UpdateData: (player: Player, key: string, amount: any?) -> (),
 	ClearData: (player: Player, key: string) -> (),
-	ClearAllData: (player: Player) -> ()
+	ClearAllData: (player: Player) -> (),
 }
 
 if RunService:IsStudio() then
@@ -130,6 +86,7 @@ local ProfileLoad: G_Types.ProfileLoad<typeof(PlayerProfile:StartSessionAsync())
 	end
 
 	profile:AddUserId(player.UserId)
+	--중복 데이터 누수 방지 :Reconcile() <-인벤토리 기능이 있는 데이터는 비활성화 권장
 	--profile:Reconcile()
 
 	profile.OnSessionEnd:Connect(function()
