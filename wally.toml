@@ -1,5 +1,5 @@
 [package]
-name = "lm-loleris/profilestore"
+name = "madexperience/profilestoreservice"
 description = "Periodic DataStore saving solution with session locking"
 version = "1.0.2"
 registry = "https://github.com/UpliftGames/wally-index"
