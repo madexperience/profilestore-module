@@ -128,7 +128,7 @@ Start()
 ------------------------------------------------------------
 local Service = {}
 
-function Service:GetData<T>(player: Player): G_Types.GetData<T>
+function Service:GetData<T>(player: Player)
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		error("GetData() 인자는 반드시 Player 개체 이어야 합니다.")
 	end
@@ -140,7 +140,7 @@ function Service:GetData<T>(player: Player): G_Types.GetData<T>
 end
 
 
-function Service:UpdateData(player: Player, key: string, amount: any?): G_Types.UpdateData
+function Service:UpdateData(player: Player, key: string, amount: any?)
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		error("첫번째 인자(player)는 무조건 플레이어 개체가 들어가야합니다.")
 	end
@@ -162,7 +162,7 @@ function Service:UpdateData(player: Player, key: string, amount: any?): G_Types.
 end
 
 
-function Service:ClearData(player: Player, key: string): G_Types.ClearData
+function Service:ClearData(player: Player, key: string)
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		error("첫번째 인자(player)는 무조건 Player 개체여야 합니다.")
 	end
@@ -181,7 +181,7 @@ function Service:ClearData(player: Player, key: string): G_Types.ClearData
 	end
 end
 
-function Service:ClearAllData(player: Player): G_Types.ClearAllData
+function Service:ClearAllData(player: Player)
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		error("첫번째 인자(player)는 무조건 Player 개체여야 합니다.")
 	end
