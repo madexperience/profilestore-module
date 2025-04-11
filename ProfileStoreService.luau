@@ -53,9 +53,9 @@ local DEFAULT_PLAYER_DATA = {
 ---------------------------------------------------------------
 ----------------------/ 메인 /----------------------------------
 ---------------------------------------------------------------
-type DEFAULT_PLAYER_DATA = typeof(DEFAULT_PLAYER_DATA)
+export type DEFAULT_PLAYER_DATA = typeof(DEFAULT_PLAYER_DATA)
 
-type G_Types = {
+export type G_Types = {
 	ProfileLoad: <T>(player: Player) -> T?,
 	RemoveProfile: (player: Player) -> (),
 	Start: () -> (),
