@@ -11,8 +11,7 @@
 -- .ClearAllData(player) <-- 데이터 리셋
 
 --	**/추가예정/**
--- :RollbackData(player,time) <- 플레이어 데이터 롤백기능 // time(os.clock Server Time)
--- :RollbackServer(time) <- 서버 롤백
+-- :RollbackData(player,sessionLog)
 ---------------------------------------------------------------
 ---------------------------------------------------------------
 
