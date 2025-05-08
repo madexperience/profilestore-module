@@ -4,9 +4,9 @@
 -- .Init() <-- 초기설정
 -- .GetData(player) <--- 데이터 가져오기
 -- .SaveData(player) <--- 데이터 저장(거래 등 중요할때만 호출! 호출비용 UpdateAsync() 1회)
--- .UpdateData(player: Player , key: string , [value: number | string]: string, number, boolean) <--- value 업데이트
--- .InsertData(player: Player , key: string , [value: number]: number}) <-- 딕셔너리 형태의 테이블(인벤토리 등) value 삽입
--- .RemoveData(player: Player , key: string , [value: number]: number) <-- 딕셔너리 형태의 테이블(인벤토리 등) value 제거
+-- .UpdateData(player: Player , key: string , {[value: number | string]: string, number, boolean}) <--- value 업데이트
+-- .InsertData(player: Player , key: string , {[value: number]: number}) <-- 딕셔너리 형태의 테이블(인벤토리 등) value 삽입
+-- .RemoveData(player: Player , key: string , {[value: number]: number}) <-- 딕셔너리 형태의 테이블(인벤토리 등) value 제거
 -- .ClearData(player,key) <--- 데이터 키 찾아서 리셋
 -- .ClearAllData(player) <-- 데이터 리셋
 
