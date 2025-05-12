@@ -200,7 +200,7 @@ function Service:ClearData(player: Player, key: string): G_Types.ClearData
 end
 ```
 
-# [UpdateData]
+# [ClearAllData]
 ```lua
 Service.ClearAllData(player: Player)
 ```
