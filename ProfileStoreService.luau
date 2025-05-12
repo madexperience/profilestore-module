@@ -5,8 +5,8 @@
 -- .GetData(player) <--- 데이터 가져오기
 -- .SaveData(player) <--- 데이터 저장(거래 등 중요할때만 호출! 호출비용 UpdateAsync() 1회)
 -- .UpdateData(player: Player , key: string , [value: number | string]: string, number, boolean) <--- value 업데이트
--- .InsertData(player: Player , key: string , [value: number]: number}) <-- 딕셔너리 형태의 테이블(인벤토리 등) value 삽입
--- .RemoveData(player: Player , key: string , [value: number]: number) <-- 딕셔너리 형태의 테이블(인벤토리 등) value 제거
+-- .InsertData(player: Player , key: string , category : string , amount : number) <-- 딕셔너리 형태의 테이블(인벤토리 등) value 삽입
+-- .RemoveData(player: Player , key: string , category : string , amount : number) <-- 딕셔너리 형태의 테이블(인벤토리 등) value 제거
 -- .ClearData(player,key) <--- 데이터 키 찾아서 리셋
 -- .ClearAllData(player) <-- 데이터 리셋
 
@@ -197,13 +197,19 @@ function Service.GetData(player: Player)
 		return nil
 	end
 
-	local profile = Profiles[player]
-	
-	if profile and profile:IsActive() then
-		return profile.Data
+	local ST = tick()
+	local MT = 10 --Max Time
+
+	while tick() - ST < MT do
+		local profile = Profiles[player]
+		if profile and profile:IsActive() then
+			return profile.Data
+		end
+		task.wait(.2)
 	end
-	
-	return nil 
+
+	PostWebHookAsync(player,"데이터 로드 대기 시간 초과 / Session Ended Please Rejoin")
+	return nil
 end
 
 --Save player data (거래시스템용 자주사용x)---------------------------------------------------------------
@@ -245,13 +251,13 @@ function Service.UpdateData(player: Player, key: string, value: any?)
 end
 
 --Insert player data (only for type of table)---------------------------------------------------------------
-function Service.InsertData(player: Player, key: string, value: number)
+function Service.InsertData(player: Player, key: string, category: string, amount : number?)
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		PostWebHookAsync(player,"잘못된 경로로 데이터스토어 접근 (확인 요함) [player]")
 		return
 	end
 	
-	if typeof(key) ~= "string" then
+	if typeof(category) ~= "string" then
 		PostWebHookAsync(player,"잘못된 경로로 데이터스토어 접근 (확인 요함) [key]")
 		return
 	end
@@ -262,23 +268,23 @@ function Service.InsertData(player: Player, key: string, value: number)
 		return
 	end
 
-	local inventory = profile.Data[key]
+	local inventory = profile.Data[category]
 	if typeof(inventory) ~= "table" then
 		PostWebHookAsync(player, "Inventory 테이블이 존재하지 않음 (손상 또는 악성 접근 가능성)" , ": " , inventory)
 		return
 	end
 
-	inventory[value] = (inventory[value] or 0) + 1
+	inventory[key] = (inventory[key] or 0) + (amount or 1)
 end
 
 --Remove player data (only for type of table)---------------------------------------------------------------
-function Service.RemoveData(player: Player , key: string , value: number)
+function Service.RemoveData(player: Player , category: string , key: string , amount : number?)
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		PostWebHookAsync(player,"잘못된 경로로 데이터스토어 접근 (확인 요함) [player]")
 		return
 	end
-	if typeof(key) ~= "string" then
-		PostWebHookAsync(player,"잘못된 경로로 데이터스토어 접근 (확인 요함) [Key]")
+	if typeof(category) ~= "string" then
+		PostWebHookAsync(player,"잘못된 경로로 데이터스토어 접근 (확인 요함) [category]")
 		return
 	end
 
@@ -290,25 +296,31 @@ function Service.RemoveData(player: Player , key: string , value: number)
 	end
 
 	--Get inventroy from profile data
-	local inventory = profile.Data[key]
+	local inventory = profile.Data[category]
 	if typeof(inventory) ~= "table" then
 		PostWebHookAsync(player, "Inventory 테이블이 존재하지 않음 (손상 또는 악성 접근 가능성)" , ": " , inventory)
 		return
 	end
 
 	--get current amount of inventory[value]
-	local currentAmount = inventory[value]
+	local currentAmount = inventory[key]
 	if typeof(currentAmount) ~= "number" or currentAmount <= 0 then
-		PostWebHookAsync(player, `아이템 제거 실패: 존재하지 않거나 개수 없음 → {key}[{value}]`)
+		PostWebHookAsync(player, `아이템 제거 실패: 존재하지 않거나 개수 없음 → {category}[{key}]`)
+		return
+	end
+
+	--Check if substract amount more than currentAmount
+	if amount > currentAmount then
+		PostWebHookAsync(player,`아이템 존재개수보다 뺄려는 수량이 더 많음 / 현재 개수: {currentAmount} / Remove Count :{amount}`)
 		return
 	end
 
 	--substract from inventory[value]
-	inventory[value] = currentAmount - 1
+	inventory[key] = currentAmount - amount
 
 	--nil if inventory[value] less than 0
-	if inventory[value] <= 0 then
-		inventory[value] = nil
+	if inventory[key] <= 0 then
+		inventory[key] = nil
 	end
 end
 
