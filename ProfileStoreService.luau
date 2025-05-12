@@ -43,8 +43,9 @@ export type DataManagerType = {
 	Init : () -> (),
 	GetData : (player : Player) -> (),
 	SaveData : (player : Player) -> (),
-	InsertData : (player: Player, key: string, value: any?) -> (),
-	RemoveData : (player: Player, key: string, value: any?) -> (),
+	UpdateData: (player: Player, key: string, value: any?) -> (),
+	InsertData : (player: Player, key: string, category: string, amount : number?) -> (),
+	RemoveData : (player: Player, key: string, category: string, amount : number?) -> (),
 	ClearData : (player: Player, key: string) -> (),
 	ClearAllData : (player: Player) -> (),
 }
@@ -82,8 +83,7 @@ end
 
 --Return UTC Time to KST Time---------------------------------------------------------------
 local function KSTTimeStamp()
-	local utc = os.time(os.date("!*t"))
-	local kst = utc + (9 * 60 * 60)
+	local kst = os.time(os.date("!*t"))
 	return os.date("%Y-%m-%d %H:%M:%S", kst)
 end
 
