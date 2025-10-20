@@ -1,4 +1,5 @@
 --Made by Mad_Experience 24.12.30 // 
+--!strict
 
 -- 사용법
 -- .Init() <-- 초기설정
@@ -15,12 +16,13 @@
 ---------------------------------------------------------------
 ---------------------------------------------------------------
 
+local HeapProfilerService = game:GetService("HeapProfilerService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
 
-local ProfileStore = require(script.ProfileStore)
+local ProfileStore = require(../ServerPackages/ProfileStore)
 
 ---------------------------------------------------------------
 ------------------/ Templates /--------------------------------
@@ -36,19 +38,8 @@ local WEBHOOK_URL = ""
 ----------------------/ Types /--------------------------------
 ---------------------------------------------------------------
 
-local DEFAULT_PLAYER_DATA = require(script.Template) --Template 경로 설정
+local DEFAULT_PLAYER_DATA = require(../Template) --Template 경로 설정
 export type DEFAULT_PLAYER_DATA = typeof(DEFAULT_PLAYER_DATA)
-
-export type DataManagerType = {
-	Init : () -> (),
-	GetData : (player : Player) -> (),
-	SaveData : (player : Player) -> (),
-	UpdateData: (player: Player, key: string, value: any?) -> (),
-	InsertData : (player: Player, key: string, category: string, amount : number?) -> (),
-	RemoveData : (player: Player, key: string, category: string, amount : number?) -> (),
-	ClearData : (player: Player, key: string) -> (),
-	ClearAllData : (player: Player) -> (),
-}
 
 ---------------------------------------------------------------
 ----------------------/ Main /---------------------------------
@@ -60,7 +51,7 @@ if RunService:IsStudio() then
 end
 
 local PlayerProfile = ProfileStore.New(DATA_STORE_KEY, DEFAULT_PLAYER_DATA)
-local Profiles: {[player]: typeof(PlayerProfile:StartSessionAsync())} = {}
+local Profiles: {[Player]: typeof(PlayerProfile:StartSessionAsync())} = {}
 
 --Add leaderstats---------------------------------------------------------------
 local function InitLeaderstats(player : Player , profile : typeof(PlayerProfile:StartSessionAsync()))
@@ -78,7 +69,6 @@ local function InitLeaderstats(player : Player , profile : typeof(PlayerProfile:
 	coin.Name = "Coin"
 	coin.Value = profile.Data.Coin
 	coin.Parent = leaderstats
-	
 end
 
 --Return UTC Time to KST Time---------------------------------------------------------------
@@ -126,7 +116,7 @@ local function PostWebHookAsync(player: Player, reason: string)
 end
 
 --Load profile---------------------------------------------------------------
-local function ProfileLoad(player : Player)
+local function ProfileLoad(player : Player): ()
 	
 	--start session when player joined
 	local profile = PlayerProfile:StartSessionAsync(`{player.UserId}`, {
@@ -176,7 +166,7 @@ end
 local Service = {}
 
 --Initializing DataManager---------------------------------------------------------------
-function Service.Init()
+function Service:Init()
 	for _, player in Players:GetChildren() do
 		task.spawn(ProfileLoad, player)
 	end
@@ -190,7 +180,7 @@ function Service.Init()
 end
 
 --Get player profile---------------------------------------------------------------
-function Service.GetData(player: Player)
+function Service:GetData(player: Player): DEFAULT_PLAYER_DATA?
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		PostWebHookAsync(player,"잘못된 경로로 데이터스토어 접근 (확인 요함)")
 		return nil
@@ -212,7 +202,7 @@ function Service.GetData(player: Player)
 end
 
 --Save player data (거래시스템용 자주사용x)---------------------------------------------------------------
-function Service.SaveData(player : Players)
+function Service:SaveData(player : Player)
 	local profile = Profiles[player]
 	if profile and profile:IsActive() then
 		profile:Save()
@@ -223,7 +213,7 @@ function Service.SaveData(player : Players)
 end
 
 --Update player data (only for Number, Bool, String)---------------------------------------------------------------
-function Service.UpdateData(player: Player, key: string, value: any?)
+function Service:UpdateData(player: Player, key: string, value: any?)
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		PostWebHookAsync(player,"잘못된 경로로 데이터스토어 접근 (확인 요함) [player]")
 		return
@@ -250,7 +240,7 @@ function Service.UpdateData(player: Player, key: string, value: any?)
 end
 
 --Insert player data (only for type of table)---------------------------------------------------------------
-function Service.InsertData(player: Player, key: string, category: string, amount : number?)
+function Service:InsertData(player: Player, key: string, category: string, amount : number?)
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		PostWebHookAsync(player,"잘못된 경로로 데이터스토어 접근 (확인 요함) [player]")
 		return
@@ -269,7 +259,7 @@ function Service.InsertData(player: Player, key: string, category: string, amoun
 
 	local inventory = profile.Data[category]
 	if typeof(inventory) ~= "table" then
-		PostWebHookAsync(player, "Inventory 테이블이 존재하지 않음 (손상 또는 악성 접근 가능성)" , ": " , inventory)
+		PostWebHookAsync(player, `Inventory 테이블이 존재하지 않음 (손상 또는 악성 접근 가능성) : {inventory}`)
 		return
 	end
 
@@ -277,7 +267,7 @@ function Service.InsertData(player: Player, key: string, category: string, amoun
 end
 
 --Remove player data (only for type of table)---------------------------------------------------------------
-function Service.RemoveData(player: Player , category: string , key: string , amount : number?)
+function Service:RemoveData(player: Player , category: string , key: string , amount : number)
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		PostWebHookAsync(player,"잘못된 경로로 데이터스토어 접근 (확인 요함) [player]")
 		return
@@ -297,7 +287,7 @@ function Service.RemoveData(player: Player , category: string , key: string , am
 	--Get inventroy from profile data
 	local inventory = profile.Data[category]
 	if typeof(inventory) ~= "table" then
-		PostWebHookAsync(player, "Inventory 테이블이 존재하지 않음 (손상 또는 악성 접근 가능성)" , ": " , inventory)
+		PostWebHookAsync(player, `Inventory 테이블이 존재하지 않음 (손상 또는 악성 접근 가능성) : {inventory}`)
 		return
 	end
 
@@ -324,7 +314,7 @@ function Service.RemoveData(player: Player , category: string , key: string , am
 end
 
 --Clear player data (기존 플레이어 데이터 초기화 사용시 주의 요함)---------------------------------------------------------------
-function Service.ClearData(player: Player, key: string)
+function Service:ClearData(player: Player, key: string)
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		PostWebHookAsync(player,"잘못된 경로로 데이터스토어 접근 (확인 요함) [player]")
 		return
@@ -345,13 +335,13 @@ function Service.ClearData(player: Player, key: string)
 	if DEFAULT_PLAYER_DATA[key] ~= nil then
 		profile.Data[key] = DEFAULT_PLAYER_DATA[key]
 	else
-		PostWebHookAsync(player,"템플릿에 해당 키가 존재하지 않음 : ",key)
+		PostWebHookAsync(player,`템플릿에 해당 키가 존재하지 않음 : {key}`)
 		return
 	end
 end
 
 --Clear all player data(플레이어 데이터 전체 초기화 사용시 주의 요함)---------------------------------------------------------------
-function Service.ClearAllData(player: Player)
+function Service:ClearAllData(player: Player)
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		error("첫번째 인자(player)는 무조건 Player 개체여야 합니다.")
 	end
@@ -369,5 +359,6 @@ function Service.ClearAllData(player: Player)
 	warn(player.Name," 의 데이터가 전체 리셋 되었습니다.")
 end
 
+export type Service = typeof(Service)
 
 return Service
